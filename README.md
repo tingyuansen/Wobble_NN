@@ -24,9 +24,8 @@ The [tutorial](blah) shows some simple use cases.
 * Please cite [blah](blah), when using this code.
 
 ## Authors
-* [Sankalp Gilda](https://www.linkedin.com/in/sankalp-gilda-41952317a) -- sankalp.gilda at gmail dot edu
 * [Yuan-Sen Ting](http://www.sns.ias.edu/~ting/) -- ting at ias dot edu
-* [Jing Luan](https://sites.google.com/view/jingluan-astrophysics) -- jingluan at ias dot edu
+* [Kento Masuda](https://www.ias.edu/scholars/kento-masuda) -- kmasuda at astro princeton edu
 
 ## Licensing
 
