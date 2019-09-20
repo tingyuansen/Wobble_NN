@@ -1,6 +1,6 @@
 # Wobble NN
 
-Predicting solar flares with LSTM
+Predicting RV without stellar models.
 
 ## Installation
 Through pip
