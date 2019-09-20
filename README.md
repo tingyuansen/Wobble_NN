@@ -16,8 +16,7 @@ python setup.py install
 The [tutorial](blah) shows some simple use cases.
 
 ## Dependencies
-* Training a new neural network requires [PyTorch](http://pytorch.org/).
-* All these dependencies will be automatically installed alongside with this package
+* Training a new neural network requires [PyTorch](http://pytorch.org/) and the third part [torch.searhsorted](https://github.com/aliutkus/torchsearchsorted)
 * I develop this package in Python 3.7 using Anaconda.
 
 ## Citing this code
