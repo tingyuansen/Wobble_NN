@@ -1,4 +1,4 @@
-# LSTM
+# Wobble NN
 
 Predicting solar flares with LSTM
 
