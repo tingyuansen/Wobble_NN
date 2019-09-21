@@ -96,12 +96,12 @@ for i in range(int(num_epoch)):
     new_wavelength = torch.t(torch.ger(wave, doppler_shift))
 
     # searchsorted if from a third party package
-    print(wave[:-1].shape)
+    print(torch.repeat(wave[:-1]).shape)
     print(new_wavelength.shape)
     np.savez("../search_sorted_test.npz",
              wave_1=wave[:-1].cpu().detach().numpy(),
              wave_2=new_wavelength.cpu().detach().numpy())
-    ind = searchsorted(wave[:-1], new_wavelength)
+    ind = searchsorted(torch.repeat(num_obs,wave[:-1]), new_wavelength)
 
     # fix a border index problem
     ind[ind == num_pixel - 1] = num_pixel - 2
