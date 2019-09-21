@@ -69,7 +69,7 @@ wave = torch.from_numpy(wavelength).type(dtype)
 
 # set the limits to extreme to make sure that it bracket the new wavelength grid
 # during interpolation
-wave_cat = wave[:-1].repeat(num_obs) 
+wave_cat = wave[:-1].repeat(num_obs).view((num_obs,wave[:-1].shape[0]))
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 
 # light speed for doppler shift
