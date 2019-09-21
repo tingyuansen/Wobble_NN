@@ -81,7 +81,8 @@ spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 c = 3e5 #km/s
 
 # optimizer
-learning_rate = 1e-2
+learning_rate_spec = 1e-1
+learning_rate_rv = 1e-3
 optimizer = torch.optim.Adam([{'params': rest_spec_model.parameters(), "lr": learning_rate},\
                               {'params': rv_model.parameters(), "lr": learning_rate}])
 
