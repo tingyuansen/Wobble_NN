@@ -44,6 +44,9 @@ class radial_velocity(torch.nn.Module):
         super(radial_velocity, self).__init__()
         self.rv = torch.nn.Parameter(torch.rand(num_obs))
 
+        # initialize with a normal spectrum
+        self.rv[:] = torch.from_numpy(spectra_rest)
+
     def forward(self):
         y_pred = self.rv
         return y_pred
@@ -124,6 +127,6 @@ for i in range(int(num_epoch)):
 
     # save results
     np.savez("../results.npz",\
-             soec_shifted_recovered = spec_shifted_recovered.cpu().detach().numpy(),\
+             spec_shifted_recovered = spec_shifted_recovered.cpu().detach().numpy(),\
              rest_spec_recovered = spec.cpu().detach().numpy(),\
              rv_recovered = RV_pred.cpu().detach().numpy())
