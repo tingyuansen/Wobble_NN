@@ -101,13 +101,13 @@ for i in range(int(num_epoch)):
     new_wavelength = torch.t(torch.ger(wave, doppler_shift))
 
     # searchsorted if from a third party package
-    np.savez("../search_sorted_test.npz",
-             wave_1=wave_cat.cpu().detach().numpy(),
-             wave_2=new_wavelength.cpu().detach().numpy())
-    temp = np.load("../search_sorted_test.npz")
-    print(searchsorted(torch.from_numpy(temp["wave_1"]).type(torch.cuda.FloatTensor),\
-                        torch.from_numpy(temp["wave_2"]).type(torch.cuda.FloatTensor)))
-    print('pass0')
+    #np.savez("../search_sorted_test.npz",
+    #         wave_1=wave_cat.cpu().detach().numpy(),
+    #         wave_2=new_wavelength.cpu().detach().numpy())
+    #temp = np.load("../search_sorted_test.npz")
+    #print(searchsorted(torch.from_numpy(temp["wave_1"]).type(torch.cuda.FloatTensor),\
+    #                    torch.from_numpy(temp["wave_2"]).type(torch.cuda.FloatTensor)))
+    #print('pass0')
 
     ind = searchsorted(wave_cat, new_wavelength)
     print('pass')
