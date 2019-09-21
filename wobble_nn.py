@@ -51,7 +51,8 @@ class radial_velocity(torch.nn.Module):
 # initiate the model
 rest_spec_model = rest_spec()
 rv_model = radial_velocity()
-
+rest_spec.cuda()
+rv_model.cuda()
 
 #========================================================================================================
 # now optimize
