@@ -96,6 +96,8 @@ for i in range(int(num_epoch)):
     new_wavelength = torch.t(torch.ger(wave, doppler_shift))
 
     # searchsorted if from a third party package
+    print(wave[:-1].shape)
+    print(new_wavelength.shape)
     np.savez("../search_sorted_test.npz",
              wave_1=wave[:-1].cpu().detach().numpy(),
              wave_2=new_wavelength.cpu().detach().numpy())
