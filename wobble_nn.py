@@ -97,8 +97,8 @@ for i in range(int(num_epoch)):
 
     # searchsorted if from a third party package
     np.savez("../search_sorted_test.npz",
-             wave_1=wave[:-1],
-             wave_2=new_wavelength)
+             wave_1=wave[:-1].cpu(),
+             wave_2=new_wavelength.cpu())
     ind = searchsorted(wave[:-1], new_wavelength)
 
     # fix a border index problem
