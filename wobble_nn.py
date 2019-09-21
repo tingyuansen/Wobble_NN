@@ -66,10 +66,11 @@ loss_fn = torch.nn.L1Loss()
 
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(dtype)
+wave_minus_1 = wave[:-1].clone()
 
 # set the limits to extreme to make sure that it bracket the new wavelength grid
 # during interpolation
-wave_cat = wave[:-1].repeat(num_obs).view((num_obs,wave[:-1].shape[0]))
+wave_cat = wave_minus_1.repeat(num_obs).view((num_obs,wave_minus_1.shape[0]))
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 
 # light speed for doppler shift
