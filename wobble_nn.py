@@ -105,6 +105,7 @@ for i in range(int(num_epoch)):
     #         wave_2=new_wavelength.cpu().detach().numpy())
     print(wave_cat.shape)
     print(new_wavelength.shape)
+    print(searchsorted(wave_cat, new_wavelength))
     ind = searchsorted(wave_cat, new_wavelength)
     print('pass')
 
