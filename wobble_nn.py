@@ -65,7 +65,8 @@ torch.set_default_tensor_type('torch.cuda.FloatTensor')
 loss_fn = torch.nn.L1Loss()
 
 # make pytorch variables
-wave = Variable(torch.from_numpy(wavelength)).type(dtype)
+wave = torch.from_numpy(wavelength).type(dtype)
+spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 
 # light speed for doppler shift
 c = 3e5 #km/s
