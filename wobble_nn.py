@@ -66,7 +66,9 @@ loss_fn = torch.nn.L1Loss()
 
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(dtype)
-wave_cat = torch.cat(num_obs*[wave[:-1]]) # np.repeat
+wave_cat = torch.cat(num_obs*[wave[:-1]]).view(num_obs,wave[:-1].shape) # np.repeat
+print(wave_cat[0,:])
+print(wave_cat[1,:])
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 
 # light speed for doppler shift
