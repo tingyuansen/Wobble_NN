@@ -99,7 +99,8 @@ for i in range(int(num_epoch)):
 
     # torch.ger = np.outer, outer product
     new_wavelength = torch.t(torch.ger(wave, doppler_shift))
-
+    new_wavelength_1 = new_wavelength.clone()
+    
     # searchsorted if from a third party package
     #np.savez("../search_sorted_test.npz",
     #         wave_1=wave_cat.cpu().detach().numpy(),
@@ -109,7 +110,7 @@ for i in range(int(num_epoch)):
     #                    torch.from_numpy(temp["wave_2"]).type(torch.cuda.FloatTensor)))
     #print('pass0')
 
-    ind = searchsorted(wave_cat, new_wavelength)
+    ind = searchsorted(wave_cat, new_wavelength_1)
     print('pass')
 
     # fix a border index problem
