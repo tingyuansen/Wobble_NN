@@ -89,7 +89,7 @@ training_loss = []
 
 #---------------------------------------------------------------------------------------------------------
 # initialize with a normal spectrum
-rest_spec_model.spec[:] = torch.from_numpy(spectra_rest).type(torch.cuda.FloatTensor)
+#rest_spec_model.spec[:] = torch.from_numpy(spectra_rest).type(torch.cuda.FloatTensor)
 
 #---------------------------------------------------------------------------------------------------------
 # optimize
