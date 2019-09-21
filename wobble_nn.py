@@ -100,7 +100,7 @@ for i in range(int(num_epoch)):
     print(new_wavelength.shape)
     np.savez("../search_sorted_test.npz",
              wave_1=wave[:-1].cpu().detach().numpy(),
-             wave_2=new_wavelength.cpu())
+             wave_2=new_wavelength.cpu().detach().numpy())
     ind = searchsorted(wave[:-1], new_wavelength)
 
     # fix a border index problem
