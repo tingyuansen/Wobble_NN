@@ -16,7 +16,8 @@ spectra_rest = temp["spectra_rest"]
 wavelength = temp["wavelength"]
 
 # number of trianing epoch
-num_epoch = 1e4
+num_epoch = 1e5
+
 
 #========================================================================================================
 # number of pixesls
@@ -77,7 +78,7 @@ spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 c = 3e5 #km/s
 
 # optimizer
-learning_rate = 0.001
+learning_rate = 1e-4
 optimizer = torch.optim.Adam([{'params': rest_spec_model.parameters(), "lr": learning_rate},\
                               {'params': rv_model.parameters(), "lr": learning_rate}])
 
