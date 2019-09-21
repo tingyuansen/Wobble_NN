@@ -102,7 +102,6 @@ for i in range(int(num_epoch)):
     new_wavelength_1 = new_wavelength.clone()
 
     ind = searchsorted(wave_cat, new_wavelength_1).type(torch.LongTensor)
-    print('pass')
 
     # fix a border index problem
     ind[ind == num_pixel - 1] = num_pixel - 2
