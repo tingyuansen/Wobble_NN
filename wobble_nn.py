@@ -45,7 +45,7 @@ class radial_velocity(torch.nn.Module):
         self.rv = torch.nn.Parameter(torch.rand(num_obs))
 
         # initialize with a normal spectrum
-        #self.rv[:] = torch.from_numpy(spectra_rest)
+        self.rv[:] = torch.from_numpy(spectra_rest)
 
     def forward(self):
         y_pred = self.rv
@@ -81,8 +81,8 @@ spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 c = 3e5 #km/s
 
 # optimizer
-learning_rate_spec = 1e-1
-learning_rate_rv = 1e-3
+learning_rate_spec = 1e-2
+learning_rate_rv = 1e-2
 optimizer = torch.optim.Adam([{'params': rest_spec_model.parameters(), "lr": learning_rate_spec},\
                               {'params': rv_model.parameters(), "lr": learning_rate_rv}])
 
