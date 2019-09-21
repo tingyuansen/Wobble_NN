@@ -16,7 +16,7 @@ spectra_rest = temp["spectra_rest"]
 wavelength = temp["wavelength"]
 
 # number of trianing epoch
-num_epoch = 1e3
+num_epoch = 1e4
 
 #========================================================================================================
 # number of pixesls
@@ -88,7 +88,7 @@ training_loss = []
 #---------------------------------------------------------------------------------------------------------
 # optimize
 for i in range(int(num_epoch)):
-    if i % 10**1 == 0:
+    if i % 10**2 == 0:
         print('Step ' + str(i) \
                 + ': Training set loss = ' + str(int(loss_data*1e5)/1e5))
 
@@ -120,3 +120,9 @@ for i in range(int(num_epoch)):
     # record training loss
     loss_data = loss.data.item()
     training_loss.append(loss_data)
+
+    # save results
+    np.savez("../results.npz",\
+             soec_shifted_recovered = spec_shifted_recovered.cpu().detach().numpy(),\
+             rest_spec_recovered = spec.cpu().detach().numpy(),\
+             rv_recovered = RV_pred.cpu().detach().numpy())
