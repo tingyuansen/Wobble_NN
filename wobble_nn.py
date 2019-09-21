@@ -21,7 +21,7 @@ num_epoch = 1e3
 #========================================================================================================
 # number of pixesls
 num_pixel = 7214
-num_obs = 20
+num_obs = 30
 
 #----------------------------------------------------------------------------------------------------------
 # make a rest frame model
@@ -109,8 +109,6 @@ for i in range(int(num_epoch)):
     slopes = (spec[1:] - spec[:-1])/(wave[1:]-wave[:-1])
     spec_shifted_recovered = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
-    print(spec_shifted_recovered.shape)
-    print(spec_shifted_torch.shape)
     # the loss function is simply comparing the reconstructed spectra vs. spectrum
     loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
 
