@@ -88,10 +88,6 @@ loss_data = 10**8
 training_loss = []
 
 #---------------------------------------------------------------------------------------------------------
-# initialize with a normal spectrum
-#rest_spec_model.spec[:] = torch.from_numpy(spectra_rest).type(torch.cuda.FloatTensor)
-
-#---------------------------------------------------------------------------------------------------------
 # optimize
 for i in range(int(num_epoch)):
     if i % 10**2 == 0:
