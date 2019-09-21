@@ -16,7 +16,7 @@ spectra_rest = temp["spectra_rest"]
 wavelength = temp["wavelength"]
 
 # number of trianing epoch
-num_epoch = 1e5
+num_epoch = 1e4
 
 
 #========================================================================================================
