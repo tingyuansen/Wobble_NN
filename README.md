@@ -17,6 +17,7 @@ The [tutorial](blah) shows some simple use cases.
 
 ## Dependencies
 * Training a new neural network requires [PyTorch](http://pytorch.org/) and the third part [torch.searhsorted](https://github.com/aliutkus/torchsearchsorted)
+* Making mock spectra requires a derivative package from The Payne: [binspec](https://github.com/tingyuansen/binspec_plus)
 * I develop this package in Python 3.7 using Anaconda.
 
 ## Citing this code
@@ -25,6 +26,7 @@ The [tutorial](blah) shows some simple use cases.
 ## Authors
 * [Yuan-Sen Ting](http://www.sns.ias.edu/~ting/) -- ting at ias dot edu
 * [Kento Masuda](https://www.ias.edu/scholars/kento-masuda) -- kmasuda at astro princeton edu
+* [Jupiter Ding] 
 
 ## Licensing
 
