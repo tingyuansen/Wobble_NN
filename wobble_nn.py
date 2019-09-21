@@ -80,7 +80,7 @@ training_loss = []
 
 #---------------------------------------------------------------------------------------------------------
 # optimize
-for i in range(num_epoch):
+for i in range(int(num_epoch)):
     if i % 10**1 == 0:
         print('Step ' + str(i) \
                 + ': Training set loss = ' + str(int(loss_data*1e5)/1e5))
