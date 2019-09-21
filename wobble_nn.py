@@ -96,6 +96,9 @@ for i in range(int(num_epoch)):
     new_wavelength = torch.t(torch.ger(wave, doppler_shift))
 
     # searchsorted if from a third party package
+    np.savez("search_sorted_test.npz",
+             wave_1=wave[:-1],
+             wave_2=new_wavelength)
     ind = searchsorted(wave[:-1], new_wavelength)
 
     # fix a border index problem
