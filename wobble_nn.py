@@ -13,6 +13,7 @@ temp = np.load("fitting_spectra.npz")
 spec_shifted = temp["spec_shifted"]
 RV_array = temp["RV_array"]
 spectra_rest = temp["spectra_rest"]
+wavelength = temp["wavelength"]
 
 # number of trianing epoch
 num_epoch = 1e3
