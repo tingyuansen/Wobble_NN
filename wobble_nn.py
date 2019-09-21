@@ -33,9 +33,6 @@ class rest_spec(torch.nn.Module):
         ## initialize with an array of [0,1] uniform numbers
         self.spec = torch.nn.Parameter(torch.rand(num_pixel))
 
-        # initialize with a normal spectrum
-        self.spec[:] = torch.from_numpy(spectra_rest)
-
     def forward(self):
         y_pred = self.spec
         return y_pred
@@ -89,6 +86,10 @@ optimizer = torch.optim.Adam([{'params': rest_spec_model.parameters(), "lr": lea
 # initiate training
 loss_data = 10**8
 training_loss = []
+
+#---------------------------------------------------------------------------------------------------------
+# initialize with a normal spectrum
+rest_spec_model.spec[:] = torch.from_numpy(spectra_rest)
 
 #---------------------------------------------------------------------------------------------------------
 # optimize
