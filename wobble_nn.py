@@ -66,7 +66,13 @@ loss_fn = torch.nn.L1Loss()
 
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(dtype)
+
+# set the limits to extreme to make sure that it bracket the new wavelength grid
+# during interpolation
 wave_cat = torch.cat(num_obs*[wave[:-1]]).view((num_obs,wave[:-1].shape[0])) # np.repeat
+wave_cat[0,:] = 13000
+wave_cat[-1,:] = 18000
+
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
 
 # light speed for doppler shift
@@ -100,7 +106,7 @@ for i in range(int(num_epoch)):
     np.savez("../search_sorted_test.npz",
              wave_1=wave_cat.cpu().detach().numpy(),
              wave_2=new_wavelength.cpu().detach().numpy())
-    ind = searchsorted(torch.t(wave_cat), torch.t(new_wavelength))
+    ind = searchsorted(wave_cat, new_wavelength)
 
     # fix a border index problem
     ind[ind == num_pixel - 1] = num_pixel - 2
