@@ -19,6 +19,7 @@ The [tutorial](blah) shows some simple use cases.
 * Training a new neural network requires [PyTorch](http://pytorch.org/) and a third part package [torch.searhsorted](https://github.com/aliutkus/torchsearchsorted)
 * Making mock spectra requires a derivative package from The Payne: [binspec](https://github.com/tingyuansen/binspec_plus)
 * I develop this package in Python 3.7 using Anaconda.
+* Running this code requires GPU/CUDA
 
 ## Citing this code
 * Please cite [blah](blah), when using this code.

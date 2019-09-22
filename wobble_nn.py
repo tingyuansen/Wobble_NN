@@ -1,9 +1,6 @@
 # import packages
 import numpy as np
-import sys
-import os
 import torch
-from torch.autograd import Variable
 from torchsearchsorted import searchsorted
 
 
@@ -12,25 +9,24 @@ from torchsearchsorted import searchsorted
 temp = np.load("fitting_spectra.npz")
 spec_shifted = temp["spec_shifted"]
 RV_array = temp["RV_array"]
-spectra_rest = temp["spectra_rest"]
+spec_rest = temp["spec_rest"]
 wavelength = temp["wavelength"]
+
+# number of pixesls and epoch
+num_pixel = spec_shifted.shape[1]
+num_obs = spec_shifted.shape[0]
 
 # number of trianing epoch
 num_epoch = 1e4
 
 
 #========================================================================================================
-# number of pixesls
-num_pixel = spec_shifted.shape[1]
-num_obs = 30
-
-#----------------------------------------------------------------------------------------------------------
-# make a rest frame model
+# make a rest frame spectral model
 class rest_spec(torch.nn.Module):
     def __init__(self):
         super(rest_spec, self).__init__()
 
-        ## initialize with an array of [0,1] uniform numbers
+        # initialize with an array of uniform random number
         self.spec = torch.nn.Parameter(torch.rand(num_pixel))
 
     def forward(self):
@@ -38,7 +34,7 @@ class rest_spec(torch.nn.Module):
         return y_pred
 
 #----------------------------------------------------------------------------------------------------------
-# make radial velocity prediction
+# radial velocity model
 class radial_velocity(torch.nn.Module):
     def __init__(self):
         super(radial_velocity, self).__init__()
@@ -52,27 +48,23 @@ class radial_velocity(torch.nn.Module):
 # initiate the model
 rest_spec_model = rest_spec()
 rv_model = radial_velocity()
+
+# make it GPU accessible
 rest_spec_model.cuda()
 rv_model.cuda()
 
 #========================================================================================================
-# now optimize
-### run on GPU ###
-dtype = torch.cuda.FloatTensor
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
-
-#---------------------------------------------------------------------------------------------------------
 # assume L2 loss
 loss_fn = torch.nn.L1Loss()
 
 # make pytorch variables
-wave = torch.from_numpy(wavelength).type(dtype)
+wave = torch.from_numpy(wavelength).type(torch.cuda.FloatTensor)
 wave_minus_1 = wave[:-1].clone()
 
 # set the limits to extreme to make sure that it bracket the new wavelength grid
 # during interpolation
 wave_cat = wave_minus_1.repeat(num_obs).view((num_obs,wave_minus_1.shape[0]))
-spec_shifted_torch = torch.from_numpy(spec_shifted).type(dtype)
+spec_shifted_torch = torch.from_numpy(spec_shifted).type(torch.cuda.FloatTensor)
 
 # light speed for doppler shift
 c = 3e5 #km/s
@@ -126,5 +118,5 @@ for i in range(int(num_epoch)):
     # save results
     np.savez("../results.npz",\
              spec_shifted_recovered = spec_shifted_recovered.cpu().detach().numpy(),\
-             rest_spec_recovered = spec.cpu().detach().numpy(),\
+             spec_rest_recovered = spec.cpu().detach().numpy(),\
              rv_recovered = RV_pred.cpu().detach().numpy())
