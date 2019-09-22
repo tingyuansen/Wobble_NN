@@ -96,9 +96,9 @@ for i in range(int(num_epoch)):
 
     # RV shift
     doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
-    new_wavelength = torch.t(torch.ger(wave, doppler_shift)) # torch.ger = outer product
-    new_wavelength_1 = new_wavelength.clone() ## not sure why I need this line.. else searhsorted complaint
-    ind = searchsorted(wave_cat, new_wavelength_1).type(torch.LongTensor)
+    new_wavelength = torch.ger(wave, doppler_shift).T # torch.ger = outer product
+    #new_wavelength_1 = new_wavelength.clone() ## not sure why I need this line.. else searhsorted complaint
+    ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
 
     # fix border indexing problem
     ind[ind == num_pixel - 1] = num_pixel - 2
