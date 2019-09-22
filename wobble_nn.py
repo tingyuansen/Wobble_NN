@@ -24,8 +24,8 @@ class rest_spec(torch.nn.Module):
     def __init__(self):
         super(rest_spec, self).__init__()
 
-        # initialize with an array of uniform random number
-        self.spec = torch.nn.Parameter(torch.from_numpy(spec_shifted[0,:]))
+        # initiate with a random epoch observation to facilitate convergence
+        self.spec = torch.nn.Parameter(torch.from_numpy(spec_shifted[0,:]).type(torch.cuda.FloatTensor))
 
     def forward(self):
         y_pred = self.spec
@@ -65,15 +65,6 @@ loss_fn = torch.nn.L1Loss()
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(torch.cuda.FloatTensor)
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(torch.cuda.FloatTensor)
-
-# initiate with a random epoch observation to facilitate convergence
-#print(rest_spec_model_1.spec)
-#rest_spec_model_1.spec = spec_shifted_torch[0,:].clone()
-#print(rest_spec_model_1.spec)
-
-#print(rest_spec_model_2.spec)
-#rest_spec_model_2.spec = spec_shifted_torch[0,:].clone()
-#print(rest_spec_model_2.spec)
 
 # make a wavelength grid to allow for mutliple RV shifts simultaneously
 # during interpolation
