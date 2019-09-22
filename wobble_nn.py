@@ -114,7 +114,7 @@ for i in range(int(num_epoch)):
     slopes_1 = (spec_1[1:] - spec_1[:-1])/(wave[1:]-wave[:-1])
 
     # linear interpolate
-    spec_shifted_recovered_1 = spec_1[ind] + slopes_1[ind]*(new_wavelength_1 - wave[ind])
+    spec_shifted_recovered_1 = spec_1[ind_1] + slopes_1[ind_1]*(new_wavelength_1 - wave[ind_1])
 
 #---------------------------------------------------------------------------------------------------------
     # spectrum 2
@@ -133,7 +133,7 @@ for i in range(int(num_epoch)):
     slopes_2 = (spec_2[1:] - spec_2[:-1])/(wave[1:]-wave[:-1])
 
     # linear interpolate
-    spec_shifted_recovered_2 = spec_2[ind] + slopes_2[ind]*(new_wavelength_2 - wave[ind])
+    spec_shifted_recovered_2 = spec_2[ind_2] + slopes_2[ind_2]*(new_wavelength_2 - wave[ind_2])
 
 #---------------------------------------------------------------------------------------------------------
     # combine prediction
