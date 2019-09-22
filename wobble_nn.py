@@ -17,7 +17,7 @@ num_pixel = spec_shifted.shape[1]
 num_obs = spec_shifted.shape[0]
 
 # number of trianing epoch
-num_epoch = 5e4
+num_epoch = 1e4
 
 
 #========================================================================================================
