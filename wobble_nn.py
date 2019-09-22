@@ -144,8 +144,8 @@ for i in range(int(num_epoch)):
     loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
 
     # regularize with physical intuitions to help the convergence
-    # add penalty when the normalize spectrum goes beyond 1.2 or go below 0
-    loss += (spec_shifted_recovered - 1.2).sum() + spec_shifted_recovered.abs().sum()
+    # here we do not allow the rest frame model to be too far off from the original one
+    loss += loss_fn(spec_shifted_recovered_1, spec_shifted_torch)*0.01
 
     # same as differential radial velocity
 
