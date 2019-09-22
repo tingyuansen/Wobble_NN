@@ -144,9 +144,12 @@ for i in range(int(num_epoch)):
     loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
 
     # regularize by physical intuition
-    # do not allowing (high penality) when the normalize spectrum goes beyond 1.2
-    loss += (spec_shifted_recovered > 1.2).sum()*1000.
+    # add penalty when the normalize spectrum goes beyond 1.2 or go below 0
+    loss += (spec_shifted_recovered - 1.2).sum() + spec_shifted_recovered.sum()
 
+    # same as differential radial velocity
+
+#---------------------------------------------------------------------------------------------------------
     # back propagation to optimize
     optimizer.zero_grad()
     loss.backward()
