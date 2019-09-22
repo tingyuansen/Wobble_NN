@@ -58,13 +58,13 @@ class telluric_velocity(torch.nn.Module):
 rest_spec_model_1 = rest_spec()
 rest_spec_model_2 = rest_spec()
 rv_model_1 = radial_velocity()
-#rv_model_2 = telluric_velocity()
+rv_model_2 = telluric_velocity()
 
 # make it GPU accessible
 rest_spec_model_1.cuda()
 rest_spec_model_2.cuda()
 rv_model_1.cuda()
-#rv_model_2.cuda()
+rv_model_2.cuda()
 
 
 #========================================================================================================
@@ -108,40 +108,32 @@ for i in range(int(num_epoch)):
     # spectrum 1
     # extract model
     spec_1 = rest_spec_model_1.spec
-    RV_pred_1 = rv_model_1.rv
+    RV_pred = rv_model_1.rv
 
     # RV shift
-    doppler_shift_1 = torch.sqrt((1 - RV_pred_1/c)/(1 + RV_pred_1/c))
-    new_wavelength_1 = torch.t(torch.ger(wave, doppler_shift_1)).contiguous() # torch.ger = outer product
-    ind_1 = searchsorted(wave_cat, new_wavelength_1).type(torch.LongTensor)
+    doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
+    new_wavelength = torch.t(torch.ger(wave, doppler_shift)).contiguous() # torch.ger = outer product
+    ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
 
     # fix border indexing problem
-    ind_1[ind_1 == num_pixel - 1] = num_pixel - 2
+    ind[ind == num_pixel - 1] = num_pixel - 2
 
     # calculate adjacent gradient
-    slopes_1 = (spec_1[1:] - spec_1[:-1])/(wave[1:]-wave[:-1])
+    slopes = (spec[1:] - spec[:-1])/(wave[1:]-wave[:-1])
 
     # linear interpolate
-    spec_shifted_recovered_1 = spec_1[ind_1] + slopes_1[ind_1]*(new_wavelength_1 - wave[ind_1])
+    spec_shifted_recovered_1 = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
 #---------------------------------------------------------------------------------------------------------
     # spectrum 2
     spec_2 = rest_spec_model_2.spec
-    RV_pred_2 = 50.-rv_model_1.rv # the RV1 + RV2 prescription
-
-    # RV shift
-    doppler_shift_2 = torch.sqrt((1 - RV_pred_2/c)/(1 + RV_pred_2/c))
-    new_wavelength_2 = torch.t(torch.ger(wave, doppler_shift_2)).contiguous() # torch.ger = outer product
-    ind_2 = searchsorted(wave_cat, new_wavelength_2).type(torch.LongTensor)
-
-    # fix border indexing problem
-    ind_2[ind_2 == num_pixel - 1] = num_pixel - 2
-
-    # calculate adjacent gradient
-    slopes_2 = (spec_2[1:] - spec_2[:-1])/(wave[1:]-wave[:-1])
-
-    # linear interpolate
-    spec_shifted_recovered_2 = spec_2[ind_2] + slopes_2[ind_2]*(new_wavelength_2 - wave[ind_2])
+    RV_pred = rv_model_2.rv
+    doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
+    new_wavelength = torch.t(torch.ger(wave, doppler_shift)).contiguous() # torch.ger = outer product
+    ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
+    ind[ind == num_pixel - 1] = num_pixel - 2
+    slopes = (spec[1:] - spec[:-1])/(wave[1:]-wave[:-1])
+    spec_shifted_recovered_2 = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
 #---------------------------------------------------------------------------------------------------------
     # combine prediction
