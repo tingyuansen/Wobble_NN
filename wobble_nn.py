@@ -143,6 +143,10 @@ for i in range(int(num_epoch)):
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
     loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
 
+    # regularize by physical intuition
+    # do not allowing (high penality) when the normalize spectrum goes beyond 1.2
+    loss += (spec_shifted_recovered > 1.2).sum()*1000.
+
     # back propagation to optimize
     optimizer.zero_grad()
     loss.backward()
