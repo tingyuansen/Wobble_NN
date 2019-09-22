@@ -53,28 +53,32 @@ rv_model = radial_velocity()
 rest_spec_model.cuda()
 rv_model.cuda()
 
+
 #========================================================================================================
 # assume L2 loss
 loss_fn = torch.nn.L1Loss()
 
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(torch.cuda.FloatTensor)
-wave_minus_1 = wave[:-1].clone()
-
-# set the limits to extreme to make sure that it bracket the new wavelength grid
-# during interpolation
-wave_cat = wave_minus_1.repeat(num_obs).view((num_obs,wave_minus_1.shape[0]))
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(torch.cuda.FloatTensor)
 
-# light speed for doppler shift
+# make a wavelength grid to allow for mutliple RV shifts simultaneously
+# during interpolation
+wave_minus_1 = wave[:-1].clone()
+wave_cat = wave_minus_1.repeat(num_obs).view((num_obs,wave_minus_1.shape[0]))
+
+#-------------------------------------------------------------------------------------------------------
+# light speed for RV shift
 c = 3e5 #km/s
 
-# optimizer
+# optimizer hyperparameters
 learning_rate_spec = 1e-2
 learning_rate_rv = 1e-2
 optimizer = torch.optim.Adam([{'params': rest_spec_model.parameters(), "lr": learning_rate_spec},\
                               {'params': rv_model.parameters(), "lr": learning_rate_rv}])
 
+
+#========================================================================================================
 # initiate training
 loss_data = 10**8
 training_loss = []
@@ -86,27 +90,30 @@ for i in range(int(num_epoch)):
         print('Step ' + str(i) \
                 + ': Training set loss = ' + str(int(loss_data*1e5)/1e5))
 
-    # doppler shift
+    # extract model
     spec = rest_spec_model.spec
     RV_pred = rv_model.rv
+
+    # RV shift
     doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
-
-    # torch.ger = np.outer, outer product
-    new_wavelength = torch.t(torch.ger(wave, doppler_shift))
-    new_wavelength_1 = new_wavelength.clone()
-
+    new_wavelength = torch.t(torch.ger(wave, doppler_shift)) # torch.ger = outer product
+    new_wavelength_1 = new_wavelength.clone() ## not sure why I need this line.. else searhsorted complaint
     ind = searchsorted(wave_cat, new_wavelength_1).type(torch.LongTensor)
 
-    # fix a border index problem
+    # fix border indexing problem
     ind[ind == num_pixel - 1] = num_pixel - 2
+
+    # calculate adjacent gradient
     slopes = (spec[1:] - spec[:-1])/(wave[1:]-wave[:-1])
+
+    # linear interpolate
     spec_shifted_recovered = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
-    # the loss function is simply comparing the reconstructed spectra vs. spectrum
+#---------------------------------------------------------------------------------------------------------
+    # the loss function is simply comparing the reconstructed spectra vs. obs spectra
     loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
 
-#---------------------------------------------------------------------------------------------------------
-    # back propagation
+    # back propagation to optimize
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -115,6 +122,7 @@ for i in range(int(num_epoch)):
     loss_data = loss.data.item()
     training_loss.append(loss_data)
 
+#---------------------------------------------------------------------------------------------------------
     # save results
     np.savez("../results.npz",\
              spec_shifted_recovered = spec_shifted_recovered.cpu().detach().numpy(),\
