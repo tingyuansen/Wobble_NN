@@ -108,10 +108,10 @@ for i in range(int(num_epoch)):
     # spectrum 1
     # extract model
     spec_1 = rest_spec_model_1.spec
-    RV_pred = rv_model_1.rv
+    RV_pred_1 = rv_model_1.rv
 
     # RV shift
-    doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
+    doppler_shift = torch.sqrt((1 - RV_pred_1/c)/(1 + RV_pred_1/c))
     new_wavelength = torch.t(torch.ger(wave, doppler_shift)).contiguous() # torch.ger = outer product
     ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
 
@@ -127,8 +127,8 @@ for i in range(int(num_epoch)):
 #---------------------------------------------------------------------------------------------------------
     # spectrum 2
     spec_2 = rest_spec_model_2.spec
-    RV_pred = rv_model_2.rv
-    doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
+    RV_pred_2 = rv_model_2.rv
+    doppler_shift = torch.sqrt((1 - RV_pred_2/c)/(1 + RV_pred_2/c))
     new_wavelength = torch.t(torch.ger(wave, doppler_shift)).contiguous() # torch.ger = outer product
     ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
     ind[ind == num_pixel - 1] = num_pixel - 2
