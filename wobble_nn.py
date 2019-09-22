@@ -56,18 +56,15 @@ class telluric_velocity(torch.nn.Module):
 #----------------------------------------------------------------------------------------------------------
 # initiate the model
 rest_spec_model_1 = rest_spec()
-rv_model_1 = radial_velocity()
-
 rest_spec_model_2 = rest_spec()
-#rv_model_2 = radial_velocity()
-rv_model_2 = telluric_velocity()
+rv_model_1 = radial_velocity()
+#rv_model_2 = telluric_velocity()
 
 # make it GPU accessible
 rest_spec_model_1.cuda()
-rv_model_1.cuda()
-
 rest_spec_model_2.cuda()
-rv_model_2.cuda()
+rv_model_1.cuda()
+#rv_model_2.cuda()
 
 
 #========================================================================================================
@@ -90,10 +87,6 @@ c = 3e5 #km/s
 # optimizer hyperparameters
 learning_rate_spec = 1e-2
 learning_rate_rv = 1e-2
-#optimizer = torch.optim.Adam([{'params': rest_spec_model_1.parameters(), "lr": learning_rate_spec},\
-#                              {'params': rv_model_1.parameters(), "lr": learning_rate_rv},\
-#                              {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec},\
-#                              {'params': rv_model_2.parameters(), "lr": learning_rate_rv}])
 optimizer = torch.optim.Adam([{'params': rest_spec_model_1.parameters(), "lr": learning_rate_spec},\
                               {'params': rv_model_1.parameters(), "lr": learning_rate_rv},\
                               {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec}])
@@ -134,7 +127,7 @@ for i in range(int(num_epoch)):
 #---------------------------------------------------------------------------------------------------------
     # spectrum 2
     spec_2 = rest_spec_model_2.spec
-    RV_pred_2 = rv_model_2.rv
+    RV_pred_2 = 1-rv_model_1.rv
 
     # RV shift
     doppler_shift_2 = torch.sqrt((1 - RV_pred_2/c)/(1 + RV_pred_2/c))
