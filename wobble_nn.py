@@ -127,7 +127,7 @@ for i in range(int(num_epoch)):
 #---------------------------------------------------------------------------------------------------------
     # spectrum 2
     spec_2 = rest_spec_model_2.spec
-    RV_pred_2 = 1-rv_model_1.rv
+    RV_pred_2 = 50.-rv_model_1.rv # the RV1 + RV2 prescription
 
     # RV shift
     doppler_shift_2 = torch.sqrt((1 - RV_pred_2/c)/(1 + RV_pred_2/c))
