@@ -43,12 +43,24 @@ class radial_velocity(torch.nn.Module):
         return y_pred
 
 #----------------------------------------------------------------------------------------------------------
+# no radial velocity (e.g. telluric)
+class telluric_velocity(torch.nn.Module):
+    def __init__(self):
+        super(radial_velocity, self).__init__()
+        self.rv = torch.nn.Parameter(torch.zeros(num_obs))
+
+    def forward(self):
+        y_pred = self.rv
+        return y_pred
+
+#----------------------------------------------------------------------------------------------------------
 # initiate the model
 rest_spec_model_1 = rest_spec()
 rv_model_1 = radial_velocity()
 
 rest_spec_model_2 = rest_spec()
-rv_model_2 = radial_velocity()
+#rv_model_2 = radial_velocity()
+rv_model_2 = telluric_velocity()
 
 # make it GPU accessible
 rest_spec_model_1.cuda()
@@ -78,10 +90,13 @@ c = 3e5 #km/s
 # optimizer hyperparameters
 learning_rate_spec = 1e-2
 learning_rate_rv = 1e-2
+#optimizer = torch.optim.Adam([{'params': rest_spec_model_1.parameters(), "lr": learning_rate_spec},\
+#                              {'params': rv_model_1.parameters(), "lr": learning_rate_rv},\
+#                              {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec},\
+#                              {'params': rv_model_2.parameters(), "lr": learning_rate_rv}])
 optimizer = torch.optim.Adam([{'params': rest_spec_model_1.parameters(), "lr": learning_rate_spec},\
                               {'params': rv_model_1.parameters(), "lr": learning_rate_rv},\
-                              {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec},\
-                              {'params': rv_model_2.parameters(), "lr": learning_rate_rv}])
+                              {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec}])
 
 
 #========================================================================================================
