@@ -145,10 +145,9 @@ for i in range(int(num_epoch)):
 
 #---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
-    #loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
-    loss = loss_fn(spec_shifted_recovered_1, spec_shifted_torch_1)\
-            + loss_fn(spec_shifted_recovered_2, spec_shifted_torch_2)
-
+    loss = loss_fn(spec_shifted_recovered, spec_shifted_torch) \
+             + loss_fn(spec_shifted_recovered_1, spec_shifted_torch_1)
+    
     # back propagation to optimize
     optimizer.zero_grad()
     loss.backward()
