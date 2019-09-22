@@ -25,8 +25,9 @@ The [tutorial](blah) shows some simple use cases.
 
 ## Authors
 * [Yuan-Sen Ting](http://www.sns.ias.edu/~ting/) -- ting at ias dot edu
-* [Kento Masuda](https://www.ias.edu/scholars/kento-masuda) -- kmasuda at astro princeton edu
-* Jupiter Ding -- thejupiterding at gmail com
+* [Kento Masuda](https://www.ias.edu/scholars/kento-masuda) -- kmasuda at astro dot princeton dot edu
+* Jupiter Ding -- thejupiterding at gmail dot com
+* [Fei Dai](https://www.astro.princeton.edu/~fdai/) -- df1990793 at googlemail dot com
 
 ## Licensing
 
