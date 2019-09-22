@@ -137,8 +137,12 @@ for i in range(int(num_epoch)):
     spec_shifted_recovered_2 = spec_2[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
 #---------------------------------------------------------------------------------------------------------
+    # combine prediction
+    spec_shifted_recovered = spec_shifted_recovered_1*spec_shifted_recovered_2
+
+#---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
-    loss = loss_fn(spec_shifted_recovered_1*spec_shifted_recovered_2, spec_shifted_torch)
+    loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
 
     # back propagation to optimize
     optimizer.zero_grad()
