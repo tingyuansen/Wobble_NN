@@ -47,7 +47,7 @@ class radial_velocity(torch.nn.Module):
 class telluric_velocity(torch.nn.Module):
     def __init__(self):
         super(radial_velocity, self).__init__()
-        self.rv = torch.nn.Parameter(torch.zeros(num_obs))
+        self.rv = torch.nn.Parameter(np.zeros(num_obs).type(torch.cuda.FloatTensor))
 
     def forward(self):
         y_pred = self.rv
