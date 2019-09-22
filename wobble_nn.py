@@ -17,7 +17,7 @@ num_pixel = spec_shifted.shape[1]
 num_obs = spec_shifted.shape[0]
 
 # number of trianing epoch
-num_epoch = 1e4
+num_epoch = 5e4
 
 
 #========================================================================================================
@@ -145,9 +145,8 @@ for i in range(int(num_epoch)):
 
 #---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
-    loss = loss_fn(spec_shifted_recovered, spec_shifted_torch) \
-             + loss_fn(spec_shifted_recovered_1, spec_shifted_torch_1)
-    
+    loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
+
     # back propagation to optimize
     optimizer.zero_grad()
     loss.backward()
