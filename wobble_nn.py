@@ -122,7 +122,7 @@ for i in range(int(num_epoch)):
     slopes = (spec_1[1:] - spec_1[:-1])/(wave[1:]-wave[:-1])
 
     # linear interpolate
-    spec_shifted_recovered_1 = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
+    spec_shifted_recovered_1 = spec_1[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
 #---------------------------------------------------------------------------------------------------------
     # spectrum 2
@@ -133,7 +133,7 @@ for i in range(int(num_epoch)):
     ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
     ind[ind == num_pixel - 1] = num_pixel - 2
     slopes = (spec_2[1:] - spec_2[:-1])/(wave[1:]-wave[:-1])
-    spec_shifted_recovered_2 = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
+    spec_shifted_recovered_2 = spec_2[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
 #---------------------------------------------------------------------------------------------------------
     # combine prediction
