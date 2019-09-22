@@ -50,15 +50,6 @@ rv_model_1 = radial_velocity()
 rest_spec_model_2 = rest_spec()
 rv_model_2 = radial_velocity()
 
-# initiate with a random epoch observation to facilitate convergence
-print(rest_spec_model_1.spec)
-rest_spec_model_1.spec = spec_shifted[0,:]
-print(rest_spec_model_1.spec)
-
-print(rest_spec_model_2.spec)
-rest_spec_model_2.spec = spec_shifted[0,:]
-print(rest_spec_model_2.spec)
-
 # make it GPU accessible
 rest_spec_model_1.cuda()
 rv_model_1.cuda()
@@ -74,6 +65,15 @@ loss_fn = torch.nn.L1Loss()
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(torch.cuda.FloatTensor)
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(torch.cuda.FloatTensor)
+
+# initiate with a random epoch observation to facilitate convergence
+print(rest_spec_model_1.spec)
+rest_spec_model_1.spec = spec_shifted_torch[0,:].clone()
+print(rest_spec_model_1.spec)
+
+print(rest_spec_model_2.spec)
+rest_spec_model_2.spec = spec_shifted_torch[0,:].clone()
+print(rest_spec_model_2.spec)
 
 # make a wavelength grid to allow for mutliple RV shifts simultaneously
 # during interpolation
