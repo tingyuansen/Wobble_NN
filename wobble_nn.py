@@ -8,6 +8,8 @@ from torchsearchsorted import searchsorted
 # restore training set
 temp = np.load("fitting_spectra.npz")
 spec_shifted = temp["spec_shifted"]
+spec_shifted_1 = temp["spec_shifted_1"]
+spec_shifted_2 = temp["spec_shifted_2"]
 wavelength = temp["wavelength"]
 
 # number of pixesls and epoch
@@ -65,6 +67,8 @@ loss_fn = torch.nn.L1Loss()
 # make pytorch variables
 wave = torch.from_numpy(wavelength).type(torch.cuda.FloatTensor)
 spec_shifted_torch = torch.from_numpy(spec_shifted).type(torch.cuda.FloatTensor)
+spec_shifted_torch_1 = torch.from_numpy(spec_shifted_1).type(torch.cuda.FloatTensor)
+spec_shifted_torch_2 = torch.from_numpy(spec_shifted_2).type(torch.cuda.FloatTensor)
 
 # make a wavelength grid to allow for mutliple RV shifts simultaneously
 # during interpolation
@@ -141,7 +145,9 @@ for i in range(int(num_epoch)):
 
 #---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
-    loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
+    #loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
+    loss = loss_fn(spec_shifted_recovered_1, spec_shifted_torch_1)\
+            + loss_fn(spec_shifted_recovered_2, spec_shifted_torch_2)
 
     # back propagation to optimize
     optimizer.zero_grad()
