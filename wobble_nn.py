@@ -8,8 +8,6 @@ from torchsearchsorted import searchsorted
 # restore training set
 temp = np.load("fitting_spectra.npz")
 spec_shifted = temp["spec_shifted"]
-RV_array = temp["RV_array"]
-spec_rest = temp["spec_rest"]
 wavelength = temp["wavelength"]
 
 # number of pixesls and epoch
@@ -46,12 +44,18 @@ class radial_velocity(torch.nn.Module):
 
 #----------------------------------------------------------------------------------------------------------
 # initiate the model
-rest_spec_model = rest_spec()
-rv_model = radial_velocity()
+rest_spec_model_1 = rest_spec()
+rv_model_1 = radial_velocity()
+
+rest_spec_model_2 = rest_spec()
+rv_model_2 = radial_velocity()
 
 # make it GPU accessible
-rest_spec_model.cuda()
-rv_model.cuda()
+rest_spec_model_1.cuda()
+rv_model_1.cuda()
+
+rest_spec_model_2.cuda()
+rv_model_2.cuda()
 
 
 #========================================================================================================
@@ -64,8 +68,8 @@ spec_shifted_torch = torch.from_numpy(spec_shifted).type(torch.cuda.FloatTensor)
 
 # make a wavelength grid to allow for mutliple RV shifts simultaneously
 # during interpolation
-wave_minus_1 = wave[:-1].clone()
-wave_cat = wave_minus_1.repeat(num_obs).view((num_obs,wave_minus_1.shape[0]))
+wave_minus = wave[:-1].clone()
+wave_cat = wave_minus.repeat(num_obs).view((num_obs,wave_minus.shape[0]))
 
 #-------------------------------------------------------------------------------------------------------
 # light speed for RV shift
@@ -74,8 +78,10 @@ c = 3e5 #km/s
 # optimizer hyperparameters
 learning_rate_spec = 1e-2
 learning_rate_rv = 1e-2
-optimizer = torch.optim.Adam([{'params': rest_spec_model.parameters(), "lr": learning_rate_spec},\
-                              {'params': rv_model.parameters(), "lr": learning_rate_rv}])
+optimizer = torch.optim.Adam([{'params': rest_spec_model_1.parameters(), "lr": learning_rate_spec},\
+                              {'params': rv_model_1.parameters(), "lr": learning_rate_rv},\
+                              {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec},\
+                              {'params': rv_model_2.parameters(), "lr": learning_rate_rv}])
 
 
 #========================================================================================================
@@ -90,12 +96,14 @@ for i in range(int(num_epoch)):
         print('Step ' + str(i) \
                 + ': Training set loss = ' + str(int(loss_data*1e5)/1e5))
 
+#---------------------------------------------------------------------------------------------------------
+    # spectrum 1
     # extract model
-    spec = rest_spec_model.spec
-    RV_pred = rv_model.rv
+    spec_1 = rest_spec_model_1.spec
+    RV_pred_1 = rv_model_1.rv
 
     # RV shift
-    doppler_shift = torch.sqrt((1 - RV_pred/c)/(1 + RV_pred/c))
+    doppler_shift = torch.sqrt((1 - RV_pred_1/c)/(1 + RV_pred_1/c))
     new_wavelength = torch.t(torch.ger(wave, doppler_shift)).contiguous() # torch.ger = outer product
     ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
 
@@ -103,14 +111,34 @@ for i in range(int(num_epoch)):
     ind[ind == num_pixel - 1] = num_pixel - 2
 
     # calculate adjacent gradient
-    slopes = (spec[1:] - spec[:-1])/(wave[1:]-wave[:-1])
+    slopes = (spec_1[1:] - spec_1[:-1])/(wave[1:]-wave[:-1])
 
     # linear interpolate
-    spec_shifted_recovered = spec[ind] + slopes[ind]*(new_wavelength - wave[ind])
+    spec_shifted_recovered_1 = spec_1[ind] + slopes[ind]*(new_wavelength - wave[ind])
+
+#---------------------------------------------------------------------------------------------------------
+    # spectrum 2
+    # extract model
+    spec_2 = rest_spec_model_2.spec
+    RV_pred_2 = rv_model_2.rv
+
+    # RV shift
+    doppler_shift = torch.sqrt((1 - RV_pred_2/c)/(1 + RV_pred_2/c))
+    new_wavelength = torch.t(torch.ger(wave, doppler_shift)).contiguous() # torch.ger = outer product
+    ind = searchsorted(wave_cat, new_wavelength).type(torch.LongTensor)
+
+    # fix border indexing problem
+    ind[ind == num_pixel - 1] = num_pixel - 2
+
+    # calculate adjacent gradient
+    slopes = (spec_2[1:] - spec_2[:-1])/(wave[1:]-wave[:-1])
+
+    # linear interpolate
+    spec_shifted_recovered_2 = spec_2[ind] + slopes[ind]*(new_wavelength - wave[ind])
 
 #---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
-    loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
+    loss = loss_fn(spec_shifted_recovered_1*spec_shifted_recovered_2, spec_shifted_torch)
 
     # back propagation to optimize
     optimizer.zero_grad()
@@ -125,5 +153,9 @@ for i in range(int(num_epoch)):
     # save results
     np.savez("../results.npz",\
              spec_shifted_recovered = spec_shifted_recovered.cpu().detach().numpy(),\
-             spec_rest_recovered = spec.cpu().detach().numpy(),\
-             rv_recovered = RV_pred.cpu().detach().numpy())
+             spec_shifted_recovered_1 = spec_shifted_recovered_1.cpu().detach().numpy(),\
+             spec_rest_recovered_1 = spec_1.cpu().detach().numpy(),\
+             rv_recovered_1 = RV_pred_1.cpu().detach().numpy(),\
+             spec_shifted_recovered_2 = spec_shifted_recovered_2.cpu().detach().numpy(),\
+             spec_rest_recovered_2 = spec_2.cpu().detach().numpy(),\
+             rv_recovered_2 = RV_pred_2.cpu().detach().numpy())
