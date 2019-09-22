@@ -141,13 +141,8 @@ for i in range(int(num_epoch)):
 
 #---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
+    ### add aditional condition to regularize with physical intuitions if needed ###
     loss = loss_fn(spec_shifted_recovered, spec_shifted_torch)
-
-    # regularize with physical intuitions to help the convergence
-    # here we do not allow the rest frame model to be too far off from the original one
-    loss += loss_fn(spec_shifted_recovered_1, spec_shifted_torch)*0.01
-
-    # same as differential radial velocity
 
 #---------------------------------------------------------------------------------------------------------
     # back propagation to optimize
