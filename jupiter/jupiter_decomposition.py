@@ -12,7 +12,7 @@ from matplotlib import rc
 rc('text', usetex=True)
 
 #%%
-#%matplotlib inline
+%matplotlib inline
 
 #%%========================================================================================================
 # load data
@@ -70,15 +70,17 @@ class rotation(torch.nn.Module):
         vrot = self.rv
         return torch.cat([vrot*0, vrot*1, -vrot]), torch.cat([vrot*0, vrot*2, -2*vrot])
 
+npoly = 1
 class continuum(torch.nn.Module):
     def __init__(self):
         super(continuum, self).__init__()
-        self.coeff = torch.nn.Parameter(torch.from_numpy(np.array([1.,0.,0.,0.,0.])).type(dtype))
+        self.coeff = torch.nn.Parameter(torch.from_numpy(np.array([1]+[0]*npoly)).type(dtype).repeat(num_obs).view((num_obs,-1)))
 
     def forward(self, x):
         c = self.coeff
         x = x - torch.mean(x)
-        return c[0] + c[1]*x + c[2]*x*x + c[3]*x*x + c[4]*x*x*x
+        _x = torch.cat([x ** i for i in range(npoly+1)]).view(npoly+1,-1)
+        return torch.cat([torch.mv(_x.t(), c[i]) for i in range(num_obs)]).view(num_obs,-1)
 
 #%%========================================================================================================
 # cpu or gpu?
@@ -103,6 +105,7 @@ rest_spec_model_3 = rest_spec()
 #rv_model_2 = radial_velocity()
 rv_model_rot = rotation()
 rv_model_3 = telluric_velocity()
+cont_model = continuum()
 
 # make it GPU accessible
 if 'cuda' in str(dtype):
@@ -121,7 +124,7 @@ learning_rate_rv = 1e-2
 optimizer = torch.optim.Adam([{'params': rest_spec_model_1.parameters(), "lr": learning_rate_spec},\
                               {'params': rest_spec_model_2.parameters(), "lr": learning_rate_spec},\
                               #{'params': rv_model_1.parameters(), "lr": learning_rate_rv},\
-                              #{'params': cont_model.parameters(), "lr": learning_rate_spec},\
+                              {'params': cont_model.parameters(), "lr": learning_rate_spec},\
                               {'params': rv_model_rot.parameters(), "lr": learning_rate_rv},\
                               {'params': rest_spec_model_3.parameters(), "lr": learning_rate_spec}])
 
@@ -190,6 +193,7 @@ for i in range(int(num_train/5)):
 #---------------------------------------------------------------------------------------------------------
     # combine prediction
     spec_shifted_recovered = spec_shifted_recovered_1*spec_shifted_recovered_2*spec_shifted_recovered_3
+    spec_shifted_recovered *= cont_model.forward(new_wavelength[0])
 
 #---------------------------------------------------------------------------------------------------------
     # the loss function is simply comparing the reconstructed spectra vs. obs spectra
@@ -216,7 +220,7 @@ print ('L2 norm:', torch.norm(spec_shifted_recovered-spec_shifted_torch, 2).data
 print ('rotation velocity:', rv_model_rot.rv.data.item())
 
 #%%
-#pl.plot(vrot_arr)
+pl.plot(vrot_arr);
 
 #%%
 rawmodels=[spec_1.detach().numpy(), spec_2.detach().numpy(), spec_3.detach().numpy()]
@@ -225,6 +229,10 @@ models=[spec_shifted_recovered_1.detach().numpy(), spec_shifted_recovered_2.deta
 #%%
 rvs=[RV_pred_1.cpu().detach().numpy(), RV_pred_2.cpu().detach().numpy(), RV_pred_3.cpu().detach().numpy()]
 #print (rvs)
+
+#%%
+conts=cont_model.forward(new_wavelength[0])
+conts=[conts[i].detach().numpy() for i in range(num_obs)]
 
 #%%
 mlabels=['planetary', 'stellar', 'telluric']
@@ -236,12 +244,12 @@ for i in range(num_obs):
     pl.xlim(wmin, wmax)
     pl.xlabel('Wavelength (angstrom)')
     pl.ylabel('Normalized flux')
-    pl.plot(wavelength[num_pix_drop:-num_pix_drop], spec_shifted[i][num_pix_drop:-num_pix_drop], '.', color='gray', lw=6, alpha=0.6, label='data')
+    pl.plot(wavelength[num_pix_drop:-num_pix_drop], (spec_shifted[i]/conts[i])[num_pix_drop:-num_pix_drop], '.', color='gray', lw=6, alpha=0.6, label='data')
     for j in range(3):
         pl.plot(wavelength[num_pix_drop:-num_pix_drop], models[j][i][num_pix_drop:-num_pix_drop], '-', alpha=0.8, label='model (%s)'%mlabels[j])
     pl.plot(wavelength[num_pix_drop:-num_pix_drop], np.prod(models, axis=0)[i][num_pix_drop:-num_pix_drop], '-', color='gray', lw=3, alpha=0.6, label='model sum')
     y0=np.min(spec_shifted[i][num_pix_drop:-num_pix_drop])-0.05
-    pl.plot(wavelength[num_pix_drop:-num_pix_drop], y0+spec_shifted[i][num_pix_drop:-num_pix_drop]-np.prod(models, axis=0)[i][num_pix_drop:-num_pix_drop], '.',  color='gray', lw=2, alpha=0.8)
+    pl.plot(wavelength[num_pix_drop:-num_pix_drop], y0+spec_shifted[i][num_pix_drop:-num_pix_drop]-(np.prod(models, axis=0)[i]*conts[i])[num_pix_drop:-num_pix_drop], '.',  color='gray', lw=2, alpha=0.8)
     pl.axhline(y=y0, lw=1, color='gray')
     pl.legend(loc='best', bbox_to_anchor=(1,1))
     pl.savefig('data_%s.png'%dlabels[i], dpi=200, bbox_inches='tight')
